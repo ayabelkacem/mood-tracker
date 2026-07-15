@@ -1,15 +1,25 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const [mood, setMood] = useState(5);
   const [journal, setJournal] = useState("");
   const [sleep, setSleep] = useState("");
+  const [entries, setEntries] = useState<any[]>([]);
+
+  const loadEntries = async () => {
+    const res = await fetch("/api/entries");
+    const data = await res.json();
+    setEntries(data);
+  };
+
+  useEffect(() => {
+    loadEntries();
+  }, []);
 
   return (
-    <main className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8 space-y-6">
+    <main className="min-h-screen bg-slate-50 flex flex-col items-center p-6">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8 space-y-6 mt-6">
         <div>
           <h1 className="text-2xl font-semibold text-slate-800">
             How are you feeling today?
@@ -61,24 +71,43 @@ export default function Home() {
 
         <button
           onClick={async () => {
-  const res = await fetch("/api/entries", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mood, sleep, journal }),
-  });
-  if (res.ok) {
-    alert("Entry saved!");
-    setJournal("");
-    setSleep("");
-    setMood(5);
-  } else {
-    alert("Something went wrong.");
-  }
-}}
+            const res = await fetch("/api/entries", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ mood, sleep, journal }),
+            });
+            if (res.ok) {
+              alert("Entry saved!");
+              setJournal("");
+              setSleep("");
+              setMood(5);
+              loadEntries();
+            } else {
+              alert("Something went wrong.");
+            }
+          }}
           className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2.5 rounded-lg transition"
         >
           Save entry
         </button>
+      </div>
+
+      <div className="w-full max-w-md mt-6 space-y-3 pb-10">
+        {entries.map((entry) => (
+          <div key={entry.id} className="bg-white rounded-xl shadow-sm p-4">
+            <div className="flex justify-between items-center">
+              <span className="font-medium text-slate-700">
+                Mood: {entry.moodScore}/10
+              </span>
+              <span className="text-xs text-slate-400">
+                {new Date(entry.createdAt).toLocaleDateString()}
+              </span>
+            </div>
+            {entry.journalText && (
+              <p className="text-sm text-slate-500 mt-1">{entry.journalText}</p>
+            )}
+          </div>
+        ))}
       </div>
     </main>
   );
