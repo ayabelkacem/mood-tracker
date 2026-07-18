@@ -8,10 +8,14 @@ export default function Home() {
   const [entries, setEntries] = useState<any[]>([]);
 
   const loadEntries = async () => {
-    const res = await fetch("/api/entries");
+  const res = await fetch("/api/entries");
+  if (res.ok) {
     const data = await res.json();
     setEntries(data);
-  };
+  } else {
+    setEntries([]);
+  }
+};
 
   useEffect(() => {
     loadEntries();
@@ -19,6 +23,10 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-50 flex flex-col items-center p-6">
+      <div className="w-full max-w-md flex justify-end gap-4 mb-2 text-sm">
+  <a href="/signup" className="text-indigo-500 hover:underline">Sign up</a>
+  <a href="/login" className="text-indigo-500 hover:underline">Log in</a>
+</div>
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8 space-y-6 mt-6">
         <div>
           <h1 className="text-2xl font-semibold text-slate-800">
