@@ -35,3 +35,48 @@ export async function GET() {
   });
   return NextResponse.json(entries);
 }
+
+export async function DELETE(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+
+  if (!id) {
+    return NextResponse.json({ error: "Missing id" }, { status: 400 });
+  }
+
+  await prisma.entry.deleteMany({
+    where: { id, userId: session.user.id },
+  });
+
+  return NextResponse.json({ success: true });
+}
+
+export async function PUT(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const { id, mood, sleep, journal } = body;
+
+  if (!id) {
+    return NextResponse.json({ error: "Missing id" }, { status: 400 });
+  }
+
+  const result = await prisma.entry.updateMany({
+    where: { id, userId: session.user.id },
+    data: {
+      moodScore: mood,
+      sleepHours: sleep ? parseFloat(sleep) : null,
+      journalText: journal || null,
+    },
+  });
+
+  return NextResponse.json({ success: true, count: result.count });
+}
