@@ -9,13 +9,14 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { mood, sleep, journal } = body;
+  const { mood, sleep, journal, tags } = body;
 
   const entry = await prisma.entry.create({
     data: {
       moodScore: mood,
       sleepHours: sleep ? parseFloat(sleep) : null,
       journalText: journal || null,
+      tags: tags || [],
       userId: session.user.id,
     },
   });
@@ -63,7 +64,7 @@ export async function PUT(request: Request) {
   }
 
   const body = await request.json();
-  const { id, mood, sleep, journal } = body;
+  const { id, mood, sleep, journal, tags } = body;
 
   if (!id) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
@@ -75,6 +76,7 @@ export async function PUT(request: Request) {
       moodScore: mood,
       sleepHours: sleep ? parseFloat(sleep) : null,
       journalText: journal || null,
+      tags: tags || [],
     },
   });
 

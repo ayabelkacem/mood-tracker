@@ -17,6 +17,7 @@ model Entry {
   moodScore    Int
   journalText  String?
   sleepHours   Float?
+  tags         String[]
   createdAt    DateTime @default(now())
   userId       String
   user         User     @relation(fields: [userId], references: [id])

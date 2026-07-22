@@ -7,8 +7,11 @@ export default function Home() {
   const [mood, setMood] = useState(5);
   const [journal, setJournal] = useState("");
   const [sleep, setSleep] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [entries, setEntries] = useState<any[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  const availableTags = ["work", "social", "health", "family", "sleep", "exercise"];
 
   const loadEntries = async () => {
     const res = await fetch("/api/entries");
@@ -30,11 +33,18 @@ export default function Home() {
     }
   }, [status]);
 
+  const toggleTag = (tag: string) => {
+    setTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
+
   const startEdit = (entry: any) => {
     setEditingId(entry.id);
     setMood(entry.moodScore);
     setSleep(entry.sleepHours?.toString() || "");
     setJournal(entry.journalText || "");
+    setTags(entry.tags || []);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -119,12 +129,32 @@ export default function Home() {
           />
         </div>
 
+        <div>
+          <label className="block text-sm font-medium text-slate-600 mb-2">Tags</label>
+          <div className="flex flex-wrap gap-2">
+            {availableTags.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => toggleTag(tag)}
+                className={`text-xs px-3 py-1.5 rounded-full border transition ${
+                  tags.includes(tag)
+                    ? "bg-indigo-500 text-white border-indigo-500"
+                    : "bg-white text-slate-600 border-slate-200 hover:border-indigo-300"
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <button
           onClick={async () => {
             const method = editingId ? "PUT" : "POST";
             const payload = editingId
-              ? { id: editingId, mood, sleep, journal }
-              : { mood, sleep, journal };
+              ? { id: editingId, mood, sleep, journal, tags }
+              : { mood, sleep, journal, tags };
 
             const res = await fetch("/api/entries", {
               method,
@@ -136,6 +166,7 @@ export default function Home() {
               setJournal("");
               setSleep("");
               setMood(5);
+              setTags([]);
               setEditingId(null);
               loadEntries();
             } else {
@@ -180,6 +211,15 @@ export default function Home() {
             </div>
             {entry.journalText && (
               <p className="text-sm text-slate-500 mt-1">{entry.journalText}</p>
+            )}
+            {entry.tags && entry.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {entry.tags.map((tag: string) => (
+                  <span key={tag} className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
+                    {tag}
+                  </span>
+                ))}
+              </div>
             )}
           </div>
         ))}
