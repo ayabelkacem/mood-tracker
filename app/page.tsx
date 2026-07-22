@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
+import StreakCalendar from "./components/StreakCalendar";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -178,6 +179,8 @@ export default function Home() {
           {editingId ? "Update entry" : "Save entry"}
         </button>
       </div>
+
+      <StreakCalendar entries={entries} />
 
       <div className="w-full max-w-md mt-6 space-y-3 pb-10">
         {entries.map((entry) => (
