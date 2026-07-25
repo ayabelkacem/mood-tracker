@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import StreakCalendar from "./components/StreakCalendar";
 import MoodChart from "./components/MoodChart";
+import MoodByWeekday from "./components/MoodByWeekday";
 export default function Home() {
   const { data: session, status } = useSession();
   const [mood, setMood] = useState(5);
@@ -182,6 +183,7 @@ export default function Home() {
 
       <StreakCalendar entries={entries} />
       <MoodChart entries={entries} />
+      <MoodByWeekday entries={entries} />
       <div className="w-full max-w-md mt-6 space-y-3 pb-10">
         {entries.map((entry) => (
           <div key={entry.id} className="bg-white rounded-xl shadow-sm p-4">
