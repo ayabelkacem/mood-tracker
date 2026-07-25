@@ -42,7 +42,7 @@ async function main() {
 
   console.log(`Seeding entries for ${user.email}...`);
 
-  const daysBack = 90;
+  const daysBack = 365;
   const entries = [];
 
   for (let i = 0; i < daysBack; i++) {
