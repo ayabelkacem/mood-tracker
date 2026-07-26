@@ -5,6 +5,7 @@ import StreakCalendar from "./components/StreakCalendar";
 import MoodChart from "./components/MoodChart";
 import MoodByWeekday from "./components/MoodByWeekday";
 import SleepMoodCorrelation from "./components/SleepMoodCorrelation";
+import MoodPrediction from "./components/MoodPrediction";
 export default function Home() {
   const { data: session, status } = useSession();
   const [mood, setMood] = useState(5);
@@ -183,6 +184,7 @@ export default function Home() {
       </div>
 
       <StreakCalendar entries={entries} />
+      <MoodPrediction />
       <MoodChart entries={entries} />
       <MoodByWeekday entries={entries} />
       <SleepMoodCorrelation entries={entries} />
