@@ -11,12 +11,37 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { mood, sleep, journal, tags } = body;
 
+  // Call the Python ML service for sentiment analysis, if there's journal text
+  let sentimentLabel: string | null = null;
+  let sentimentScore: number | null = null;
+
+  if (journal && journal.trim()) {
+    try {
+      const mlUrl = process.env.NEXT_PUBLIC_ML_SERVICE_URL || "http://localhost:8000";
+      const res = await fetch(`${mlUrl}/sentiment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: journal }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        sentimentLabel = data.label;
+        sentimentScore = data.score;
+      }
+    } catch (err) {
+      console.error("Sentiment analysis failed:", err);
+      // Don't block saving the entry just because the ML service is unreachable
+    }
+  }
+
   const entry = await prisma.entry.create({
     data: {
       moodScore: mood,
       sleepHours: sleep ? parseFloat(sleep) : null,
       journalText: journal || null,
       tags: tags || [],
+      sentimentLabel,
+      sentimentScore,
       userId: session.user.id,
     },
   });

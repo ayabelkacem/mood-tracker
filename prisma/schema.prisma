@@ -21,6 +21,8 @@ model Entry {
   createdAt    DateTime @default(now())
   userId       String
   user         User     @relation(fields: [userId], references: [id])
+  sentimentLabel  String?
+  sentimentScore  Float?
 }
 model User {
   id        String   @id @default(cuid())
