@@ -6,6 +6,7 @@ import MoodChart from "./components/MoodChart";
 import MoodByWeekday from "./components/MoodByWeekday";
 import SleepMoodCorrelation from "./components/SleepMoodCorrelation";
 import MoodPrediction from "./components/MoodPrediction";
+
 export default function Home() {
   const { data: session, status } = useSession();
   const [mood, setMood] = useState(5);
@@ -228,6 +229,19 @@ export default function Home() {
                     {tag}
                   </span>
                 ))}
+              </div>
+            )}
+            {entry.sentimentLabel && (
+              <div className="mt-2">
+                <span
+                  className={`text-xs px-2 py-0.5 rounded-full ${
+                    entry.sentimentLabel === "positive"
+                      ? "bg-emerald-100 text-emerald-600"
+                      : "bg-rose-100 text-rose-600"
+                  }`}
+                >
+                  Journal sentiment: {entry.sentimentLabel} ({Math.round(entry.sentimentScore * 100)}%)
+                </span>
               </div>
             )}
           </div>
